@@ -3,8 +3,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-HG_TMP_DIR="$SCRIPT_DIR/tmp-hg"
-GIT_TMP_DIR="$SCRIPT_DIR/tmp-git"
+TMP_DIR="$SCRIPT_DIR/tmp"
+GIT_TMP_DIR="$SCRIPT_DIR/converted-repos"
 FAST_EXPORT_DIR="$SCRIPT_DIR/fast-export"
 AUTHORS_FILE="$SCRIPT_DIR/hg-authors"
 
@@ -22,15 +22,13 @@ CLONE_URL=${1:-}
 NAME_OVERRIDE=${2:-}
 [ -z "$CLONE_URL" ] && err "Usage: $0 git-url [local-filename]"
 
-rm -rf "$HG_TMP_DIR"
-mkdir -p "$HG_TMP_DIR" "$GIT_TMP_DIR"
-
-cd "$HG_TMP_DIR"
+rm -rf "$TMP_DIR"
+mkdir -p "$TMP_DIR"
+cd "$TMP_DIR"
 echo "Ready to clone $CLONE_URL"
 hg clone $CLONE_URL $NAME_OVERRIDE
 
 REPO_NAME=`ls | head -n 1`
-
 cd $REPO_NAME
 
 NEW_AUTHORS=""
@@ -45,12 +43,14 @@ done
 [ -z "$NEW_AUTHORS" ] || err "New authors added in $AUTHORS_FILE. Update mappings now."
 
 
+mkdir -p "$GIT_TMP_DIR"
 cd "$GIT_TMP_DIR"
+[[ -d "$REPO_NAME" ]] && err "Target path $GIT_TMP_DIR/$REPO_NAME already exists"
 mkdir $REPO_NAME
 cd $REPO_NAME
 
 echo "Ready to convert repo $REPO_NAME"
 git init
-$FAST_EXPORT_DIR/hg-fast-export.sh -r "$HG_TMP_DIR/$REPO_NAME" -A "$AUTHORS_FILE"
+$FAST_EXPORT_DIR/hg-fast-export.sh -r "$TMP_DIR/$REPO_NAME" -A "$AUTHORS_FILE"
 
-rm -rf "$HG_TMP_DIR"
+rm -rf "$TMP_DIR"

@@ -1,6 +1,5 @@
 tmp
-tmp-hg
-tmp-git
+converted-repos
 fast-export
 hg-authors
 .env
