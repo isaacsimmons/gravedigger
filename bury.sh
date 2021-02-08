@@ -27,7 +27,6 @@ git clone --bare --mirror $CLONE_URL $NAME_OVERRIDE
 REPO_FULL_NAME=`ls | head -n 1`
 REPO_NAME=`echo $REPO_FULL_NAME | sed "s/.git$//"`
 
-
 cd $REPO_FULL_NAME
 
 LAST_COMMIT_DATE=`git log -1 --date=format:%Y-%m-%d --format="%cd"`
