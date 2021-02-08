@@ -26,11 +26,14 @@ git clone --bare --mirror $CLONE_URL $NAME_OVERRIDE
 
 REPO_FULL_NAME=`ls | head -n 1`
 REPO_NAME=`echo $REPO_FULL_NAME | sed "s/.git$//"`
-BUNDLE_PATH="$GRAVEYARD_DIR/$REPO_NAME.bundle"
 
-[ -e "$BUNDLE_PATH" ] && err "ERROR: File already exists at $BUNDLE_PATH"
 
 cd $REPO_FULL_NAME
+
+LAST_COMMIT_DATE=`git log -1 --date=format:%Y-%m-%d --format="%cd"`
+BUNDLE_PATH="$GRAVEYARD_DIR/$REPO_NAME-$LAST_COMMIT_DATE.bundle"
+
+[ -e "$BUNDLE_PATH" ] && err "ERROR: File already exists at $BUNDLE_PATH"
 echo "Ready to create bundle $BUNDLE_PATH"
 git bundle create "$BUNDLE_PATH" --all
 
